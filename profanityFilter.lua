@@ -44,11 +44,7 @@ function wordBuster.Load()
 			local f = io.open(path, "r")
 			if f ~= nil then
 				local words = {}
-				for line in f:lines() do
-					table.insert(words, line)
-				end
-
-				for _, word in pairs(words) do
+				for word in f:lines() do
 					local formattedWord = ""
 					local letters = {}
 					word:gsub(".",function(c) table.insert(letters,c) end)
@@ -76,24 +72,26 @@ end
 
 wordBuster.Load()
 
-function printNameWithID(playerID) return GetPlayerName(playerID).."("..playerID..")" end
+function printNameWithID(playerID) return (GetPlayerName(playerID) or "Unknown").."("..playerID..")" end
 
 function wordBuster.checkText(text) --takes in string, returns count of censored words and censored text
 	local total = 0
 	local originalText = text
 	for _, word in pairs(wordBuster.badWords) do
-		local message, count = string.gsub(text, word, function( s )
+		local message, count = string.gsub(text, word, function( word )
 			local censored = ""
 			local l = 0
+			local letters = {}
+			word:gsub(".",function(c) table.insert(letters,c) end)
 			if wordBuster.semiCensor then
-				censored = s[1]
-				while l < string.len(s) - 2 do
+				censored = letters[1]
+				while l < string.len(word) - 2 do
 					censored = censored..wordBuster.censor
 					l = l + 1
 				end
-				censored = censored..s[string.len(s)]
+				censored = censored..letters[string.len(word)]
 			else
-				while l < string.len(s) do
+				while l < string.len(word) do
 					censored = censored..wordBuster.censor
 					l = l + 1
 				end
@@ -108,24 +106,22 @@ function wordBuster.checkText(text) --takes in string, returns count of censored
 end
 
 
-
 function onChatMessage(playerID, name, originalMsg)
 	local total, filteredMsg = wordBuster.checkText(originalMsg)
-
 	if total > 0 then
 		if wordBuster.notify then
 			SendChatMessage(playerID, wordBuster.notifyText)
 		end
 
-		print(printNameWithID(playerID).." tried to say: "..originalText)
-		SendChatMessage(-1, GetPlayerName(playerID).." wanted to say: "..text)
+		clog(printNameWithID(playerID).." tried to say: "..originalMsg..", corrected to: "..filteredMsg)
+		SendChatMessage(-1, name.." wanted to say: "..filteredMsg)
 		return 1
 	end
 end
 
 function onPlayerAuth(name, role, isGuest)
 	if wordBuster.checkUsernames and wordBuster.checkText(name) > 0 then
-		print(name..(isGuest and " (guest)" or "").." tried to join with a bad name, kicking")
+		clog(name..(isGuest and " (guest)" or "").." tried to join with a bad name, kicking")
 		return "Your name contains a bad word, you must change it to join this server!"
 	end
 end
@@ -134,3 +130,5 @@ RegisterEvent("onChatMessage","onChatMessage")
 RegisterEvent("onPlayerAuth","onPlayerAuth")
 
 clog("(Word Buster) finished loading")
+
+--return wordBuster

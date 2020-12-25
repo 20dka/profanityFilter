@@ -64,7 +64,8 @@ wordBuster.patterns = {
 	["w"] = "[wW]",
 	["x"] = "[xX]",
 	["y"] = "[yY]",
-	["z"] = "[zZ2]"
+	["z"] = "[zZ2]",
+	["&"] = "[&]"
 }
 
 -- Check Usernames: Whether usernames should be checked upon joining or not
