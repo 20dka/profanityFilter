@@ -65,10 +65,23 @@ wordBuster.patterns = {
 	["x"] = "[xX]",
 	["y"] = "[yY]",
 	["z"] = "[zZ2]",
+	["0"] = "[oO0]",
+	["1"] = "[iIl!1]",
+	["2"] = "[2]",
+	["3"] = "[eE3]",
+	["4"] = "[4]",
+	["5"] = "[sS$5]",
+	["6"] = "[gG6]",
+	["7"] = "[tT7]",
+	["8"] = "[8]",
+	["9"] = "[qQ9]",
 	["&"] = "[&]"
 }
 
--- Check Usernames: Whether usernames should be checked upon joining or not
+-- Check Usernames: Whether usernames should be checked upon joining
 wordBuster.checkUsernames = true
+
+-- Log to File: Whether the plugin should save its messages to a log file
+wordBuster.logToFile = true
 
 return true

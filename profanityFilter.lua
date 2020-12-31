@@ -3,8 +3,7 @@
 -- based on https://github.com/Starfox64/word-buster
 wordBuster = wordBuster or {}
 
-function clog(text) clog(text, true) end
-function clog(text, saveToDisk)
+function clog(text)
 	if text == nil then
 		return
 	end
@@ -15,7 +14,7 @@ function clog(text, saveToDisk)
 
 	print(os.date("[%d/%m/%Y %H:%M:%S]").." [profanityFilter] "..text)
 
-	if saveToDisk then
+	if not (wordBuster.logToFile~=nil and not wordBuster.logToFile) then --default to writing
 		file = io.open("log.txt", "a")
 		file:write(os.date("[%d/%m/%Y %H:%M:%S] ")..text.."\n")
 		file:close()
@@ -120,8 +119,9 @@ function onChatMessage(playerID, name, originalMsg)
 end
 
 function onPlayerAuth(name, role, isGuest)
-	if wordBuster.checkUsernames and wordBuster.checkText(name) > 0 then
-		clog(name..(isGuest and " (guest)" or "").." tried to join with a bad name, kicking")
+	local total, filteredName = wordBuster.checkText(name)
+	if wordBuster.checkUsernames and total > 0 then
+		clog(filteredName..(isGuest and " (guest)" or "").." tried to join with the name "..name..", kicking")
 		return "Your name contains a bad word, you must change it to join this server!"
 	end
 end
@@ -130,5 +130,6 @@ RegisterEvent("onChatMessage","onChatMessage")
 RegisterEvent("onPlayerAuth","onPlayerAuth")
 
 clog("(Word Buster) finished loading")
+
 
 --return wordBuster
